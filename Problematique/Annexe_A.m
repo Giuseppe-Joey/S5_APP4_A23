@@ -37,18 +37,22 @@ A = [-0.018223  -0.088571   -9.78   0;
       0     0];
       
       
- delta_c = 1;
- a_prop = 1;
- v = 1;
- alpha = 1;
- teta = 1;
- q = 1;
- gamma = 1;
+ delta_c = 1;       % angle du gouvernail de profondeur
+ a_prop = 1;        % fraction de la poussée maximale des moteurs (0 < aprop < 1)
+ v = 1;             % vitesse de l<avion
+ alpha = 1;         % angle d<attaque (entre l<axe longitudinal de lavion et la vitesse)
+ teta = 1;          % angle de tanguage( entre l<axe longitudinal de lavion et le plan horizontal)
+ q = 1;             % vitesse angulaire en tanguage de lavion (q = d teta / dt)
+ gamma = 1;         % angle de vol de lavion ( gamma = teta - alpha): si gamma > 0, lavion monte, si gamma < 0 lavion descend
  
+ % Variables d'entrée (capteurs)
+ u = [delta_c   a_prop]';        % en degres et en fraction de la poussee maximale
  
- u = [delta_c a_prop]';        % en degres et en fraction de la poussee maximale
- x = [v alpha teta q]';
- y = [v alpha teta q gamma]';
+ % variables d'états
+ x = [v     alpha   teta    q]';
+
+ % variables de sorties (capteurs)
+ y = [v     alpha   teta    q   gamma]';
  
  
 
