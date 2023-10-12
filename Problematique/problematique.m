@@ -30,33 +30,79 @@ Annexe_A
 %                    temporelle.
 
 % calcul des valeurs propres du systeme et des caracteristiques temporelles
-val_propes = eig(A)    
+val_propes = eig(A);   
 
-wn = abs(val_propes)
+wn = abs(val_propes);
 
 % on remarque des paires de valeurs semblables et que la paire (1:2) >> (3:4)
 % ---> on garde wn(1) ou wn(2)
-wn = wn(1)
+wn = wn(1);
 
-zeta = abs(real(val_propes)) / wn
-zeta = zeta(1)
+zeta = abs(real(val_propes)) / wn;
+zeta = zeta(1);
 
-phi = acos(zeta)
-phi_degres = acosd(zeta)
+phi = acos(zeta);
+phi_degres = acosd(zeta);
 
-wa = wn * sqrt(1-(zeta^2))
+wa = wn * sqrt(1-(zeta^2));
 
 ts = 4 / (zeta * wn);
-ts = ts(1)
+ts = ts(1);
 
-pi = 3.141592653;
 tp = pi / wa;
-tp = tp(1)
+tp = tp(1);
 
-Mp = 100 * exp(-pi/tan(phi))
+Mp = 100 * exp(-pi/tan(phi));
 
 
 
+% affichage des caracartéristiques temporelles
+disp(["---------------------------------------------"]);
+disp(["Affichage des caracartéristiques temporelles:"]);
+disp(["---------------------------------------------"])
+disp(['wn = ', num2str(wn), ' rad/s']);
+disp(['zeta = ', num2str(zeta), ' unites']);
+disp(['wa = ', num2str(wa), ' rad/s']);
+disp(['phi = ', num2str(phi), ' radian']);
+disp(['phi = ', num2str(phi_degres), ' degrés']);
+disp(['Mp = ', num2str(Mp), ' %']);
+disp(['ts = ', num2str(ts), ' s']);
+disp(['tp = ', num2str(tp), ' s']);
+disp(["---------------------------------------------"])
+
+
+% fonction de transfert a partir des caract/ristiques temporelles
+num = [wn^2];
+den = [1    2*zeta*wn   wn^2];
+TF = tf(num, den)
+
+figure('Name', 'Question a)')
+step(TF)
+title("Réponse impultionnelle à partir des carac temporelles")
+grid on
+
+
+% deuxieme partie
+% on trouve la fonction de transfert pour le 2e element de la matrice U
+% (soit aprop)
+[num, den] = ss2tf(A, B, C, D, 2);
+v_sur_aprop = tf(num(1,:), den)
+
+% on peut trouver les ft sur chacun des elements de la sortie 
+% alpha_sur_aprop = tf(num(2,:), den)
+% teta_sur_aprop = tf(num(3,:), den)
+% q_sur_aprop = tf(num(4,:), den)
+% gamma_sur_aprop = tf(num(5,:), den)
+
+
+[R, P, K] = residue(num(1,:), den)
+poid = abs(R) ./ abs(real(P))
+[num, den] = residue(R(3:4), P(3:4), K)
+TF_reduce = tf(num, den)
+
+
+zeros = roots(num(1,:))
+poles = roots(den)
 
 
 
@@ -67,10 +113,8 @@ Mp = 100 * exp(-pi/tan(phi))
 %% b) IDENTIFICATION DE LA FONCTION DE TRANSFERT À PHASE NON-MINIMALE
 %       À PARTIR DES PÔLES ET DES ZÉROS
 
-% iu = 1;
-% TS = 100;
-% [num, den] = ss2tf(A, B, C, D, iu)
-% tf = tf(num, den)
+
+
 
 
 

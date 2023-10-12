@@ -67,10 +67,10 @@ zeros = roots(num(1,:))
 poles = roots(den)
 
 
-p1 = poles(1);
-p2 = poles(2);
-p3 = poles(3);
-p4 = poles(4);
+p1 = poles(1)
+p2 = poles(2)
+p3 = poles(3)
+p4 = poles(4)
 
 
 z1 = zeros(1);
