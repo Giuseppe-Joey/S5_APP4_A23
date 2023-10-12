@@ -29,15 +29,35 @@ Annexe_A
 %                    vérifier ces résultats à partir de la réponse
 %                    temporelle.
 
+% calcul des valeurs propres du systeme et des caracteristiques temporelles
+val_propes = eig(A)    
 
-val_propes = eig(A)
+wn = abs(val_propes)
 
-% - TEMPS DU PREMIER PIC 
+% on remarque des paires de valeurs semblables et que la paire (1:2) >> (3:4)
+% ---> on garde wn(1) ou wn(2)
+wn = wn(1)
+
+zeta = abs(real(val_propes)) / wn
+zeta = zeta(1)
+
+phi = acos(zeta)
+phi_degres = acosd(zeta)
+
+wa = wn * sqrt(1-(zeta^2))
+
+ts = 4 / (zeta * wn);
+ts = ts(1)
+
+pi = 3.141592653;
+tp = pi / wa;
+tp = tp(1)
+
+Mp = 100 * exp(-pi/tan(phi))
 
 
-% creation dune matrice identite de la meme taille que val propres
-I = eye(size(val_propes))
-den = det((val_propes.*I) - A)
+
+
 
 
 
