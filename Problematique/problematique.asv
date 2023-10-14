@@ -37,82 +37,98 @@ val_propes = eig(A)
 [num, den] = ss2tf(A, B, C, D, 2);      
 v_sur_aprop = tf(num(1,:), den)
 
+zeros = roots(num(1,:))
+poles = roots(den)
+
+figure
+pzmap(zeros, poles)
+grid on
+
+
+figure
+rlocus(v_sur_aprop)
+grid on
+
+
 % on peut trouver les ft sur chacun des elements de la sortie 
 % alpha_sur_aprop = tf(num(2,:), den)
 % teta_sur_aprop = tf(num(3,:), den)
 % q_sur_aprop = tf(num(4,:), den)
 % gamma_sur_aprop = tf(num(5,:), den)
 
-
+% reduction de la FT avec residue
 [R, P, K] = residue(num(1,:), den);
 poid = abs(R) ./ abs(real(P))
-[num, den] = residue(R(3:4), P(3:4), K);
+[numR, denR] = residue(R(3:4), P(3:4), K);
+TF_reduce_temporaire = tf(numR, denR)
 
-TF_reduce = tf(num, den)
-zeros = roots(num)
-poles = roots(den)
+% ajustement du gain DC
+gain0 = dcgain(v_sur_aprop);
+gainR = dcgain(TF_reduce_temporaire);
+
+new_num = numR * (gain0/gainR);
+TF_reduce = tf(new_num, denR)
 
 
+
+zeros = roots(new_num);
+poles = roots(denR);
+
+figure
+pzmap(zeros, poles)
+grid on
+
+figure('Name', 'Question a)')
+step(TF_reduce)
+title("Réponse temporelle à partir des carac temporelles")
+grid on
 
 
 
 % selon la formule du     wa = wn* sqrt(1-zeta^2)
 wa = abs(imag(poles));
-wa = wa(1)
+wa = wa(1);
 
+% alpha est egal zeta * wn
 alpha = abs(real(poles));
-alpha = alpha(1)
+alpha = alpha(1);
 
-% wn est la norme de la partie reelle et la partie imaginaire
 wn = abs(poles);
 wn = wn(1);
-% wn = sqrt((alpha.^2)+(wa.^2));      % verification
 
-% on remarque des paires de valeurs semblables et que la paire (1:2) >> (3:4)
-% ---> on garde wn(1:2) pour le premier mode et wn(3:4) pour le 2e mode 
-% wn = wn(1)
-% wn2 = wn(3);
+zeta = abs(alpha / wn);
+phi = acos(zeta);
+phi_degres = acosd(zeta);
+ts = 4 / (zeta * wn);
 
-zeta = abs(alpha / wn)
-zeta = zeta(1)
-
-phi = acos(zeta)
-phi_degres = acosd(zeta)
-
-ts = 4 / (zeta * wn)
-ts = ts(1)
-
-tp = pi / wa
-tp = tp(1)
-
-Mp = 100 * exp(-pi/tan(phi))
-
+tp = pi / wa;
+Mp = 100 * exp(-pi/tan(phi));
 
 
 % affichage des caracartéristiques temporelles
 disp(["---------------------------------------------"]);
 disp(["Affichage des caracartéristiques temporelles:"]);
 disp(["---------------------------------------------"])
-disp(['wn = ', num2str(wn), ' rad/s']);
+disp(['wn   = ', num2str(wn), ' rad/s']);
 disp(['zeta = ', num2str(zeta), ' unites']);
-disp(['wa = ', num2str(wa), ' rad/s']);
-disp(['phi = ', num2str(phi), ' radian']);
-disp(['phi = ', num2str(phi_degres), ' degrés']);
-disp(['Mp = ', num2str(Mp), ' %']);
-disp(['ts = ', num2str(ts), ' s']);
-disp(['tp = ', num2str(tp), ' s']);
+disp(['wa   = ', num2str(wa), ' rad/s']);
+disp(['phi  = ', num2str(phi), ' radian']);
+disp(['phi  = ', num2str(phi_degres), ' degrés']);
+disp(['Mp   = ', num2str(Mp), ' %']);
+disp(['ts   = ', num2str(ts), ' s']);
+disp(['tp   = ', num2str(tp), ' s']);
 disp(["---------------------------------------------"])
 
 
-% fonction de transfert a partir des caract/ristiques temporelles
-num = [wn^2];
-den = [1    2*zeta*wn   wn^2];
-TF = tf(num, den)
-
-figure('Name', 'Question a)')
-step(TF)
-title("Réponse impultionnelle à partir des carac temporelles")
-grid on
+% % fonction de transfert a partir des caract/ristiques temporelles
+% num = [wn^2];
+% den = [1    2*zeta*wn   wn^2];
+% TF = tf(num, den)
+% 
+% figure('Name', 'Question a)')
+% step(TF)
+% title("Réponse temporelle à partir des carac temporelles")
+% grid on
 
 
 
