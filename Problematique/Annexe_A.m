@@ -45,7 +45,7 @@ A = [-0.018223  -0.088571   -9.78   0;
  q = 1;             % vitesse angulaire en tanguage de lavion (q = d teta / dt)
  gamma = 1;         % angle de vol de lavion ( gamma = teta - alpha): si gamma > 0, lavion monte, si gamma < 0 lavion descend
  
- % Variables d'entrée (capteurs)
+ % Variables d'entrée (actionneurs)
  u = [delta_c   a_prop]';        % en degres et en fraction de la poussee maximale
  
  % variables d'états
