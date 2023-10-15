@@ -192,11 +192,9 @@ disp('**** dessiner a la main le lieu des racines ****')
 %% d) EXPLICATION DE L'EFFET DE LA RÉTROACTION Kv SUR LA STABILITÉ,
 %       LE TEMPS DE STAB ET LE DEPASS MAX A PARTIR DU LIEU DE RACINES
 
-[numFTBF, denFTBF] = rlocus(v_sur_aprop);
+[numFTBF, denFTBF] = rlocus(v_sur_aprop)
 
-% den_s = polyval(den,s)
-
-Kv = ((-1)*(den)) ./ num
+Kv = (-den) ./ num
 
 % Kv = (denFTBF - den) ./ num
 
