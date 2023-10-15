@@ -92,11 +92,10 @@ TF_a_partir_zeros_poles_v_aprop = tf(num,den)
 % section lucas
 % identification de la fonction de transfert à partir des pôles et zéros
 z = zeros;
-p = val_propres_A.';
-%p = poles;
+p = poles;
 k = 1;
-sys_zpk = zpk(z, p, k);
-display(sys_zpk)
+sys_zpk = zpk(z, p, k)
+
 
 
 

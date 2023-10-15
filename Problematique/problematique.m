@@ -18,6 +18,7 @@ clear all
 fprintf("*** Chargement du fichier 'Annexe_A' ***\n");
 Annexe_A
 
+
 %% a) ANALYSE DES CARACTÉRISTIQUES DYNAMIQUES DE L'AVION
 %     À PÂRTIR DES VALEURS PROPRES DU SYSTEME ET DE LA RÉPONSE TEMPORELLE
 %     DE LA VITESSE v DU SYSTEME SOUMIS A UN ÉCHELON SUR a_prop
@@ -28,6 +29,9 @@ Annexe_A
 %                   -la période des oscillations amorties et naturelles et 
 %                    vérifier ces résultats à partir de la réponse
 %                    temporelle.
+
+disp(" ")
+disp("*** Question a) ***")
 
 % calcul des valeurs propres du systeme 
 val_propes = eig(A)
@@ -40,12 +44,12 @@ v_sur_aprop = tf(num(1,:), den)
 zeros = roots(num(1,:))
 poles = roots(den)
 
-figure
+figure('Name', 'Question a)')
 pzmap(zeros, poles)
 grid on
 
 
-figure
+figure('Name', 'Question a)')
 rlocus(v_sur_aprop)
 grid on
 
@@ -60,11 +64,11 @@ grid on
 [R, P, K] = residue(num(1,:), den);
 poid = abs(R) ./ abs(real(P))
 [numR, denR] = residue(R(3:4), P(3:4), K);
-TF_reduce_temporaire = tf(numR, denR)
+TF_temporaire = tf(numR, denR)
 
 % ajustement du gain DC
 gain0 = dcgain(v_sur_aprop);
-gainR = dcgain(TF_reduce_temporaire);
+gainR = dcgain(TF_temporaire);
 
 new_num = numR * (gain0/gainR);
 TF_reduce = tf(new_num, denR)
@@ -74,7 +78,7 @@ TF_reduce = tf(new_num, denR)
 zeros = roots(new_num);
 poles = roots(denR);
 
-figure
+figure('Name', 'Question a)')
 pzmap(zeros, poles)
 grid on
 
@@ -118,16 +122,11 @@ disp(['ts   = ', num2str(ts), ' s']);
 disp(['tp   = ', num2str(tp), ' s']);
 disp(["---------------------------------------------"])
 
+fprintf("\n\n\n")
 
-% % fonction de transfert a partir des caract/ristiques temporelles
-% num = [wn^2];
-% den = [1    2*zeta*wn   wn^2];
-% TF = tf(num, den)
-% 
-% figure('Name', 'Question a)')
-% step(TF)
-% title("Réponse temporelle à partir des carac temporelles")
-% grid on
+
+
+
 
 
 
@@ -138,10 +137,36 @@ disp(["---------------------------------------------"])
 %% b) IDENTIFICATION DE LA FONCTION DE TRANSFERT À PHASE NON-MINIMALE
 %       À PARTIR DES PÔLES ET DES ZÉROS
 
+disp(" ")
+disp(" ")
+disp("*** Question b) ***")
+
+% on utilise le 2e element de lentree soit a_prop
+[num, den] = ss2tf(A, B, C, D, 2)      
+v_sur_aprop = tf(num(1,:), den)
+
+zeros = roots(num(1,:))
+poles = roots(den)
+
+longueur_zeros = length(zeros);
+longueur_poles = length(poles);
+
+[num, den] = zp2tf(zeros, poles, 1);
+TF_a_partir_zeros_poles_v_aprop = tf(num,den)
 
 
+figure('Name', 'Question b)')
+rlocus(TF_a_partir_zeros_poles_v_aprop)
+title("FT a partir de zp2tf()")
 
+% identification de la fonction de transfert à partir des pôles et zéros
+systeme_zpk = zpk(zeros, poles, 1)
 
+figure('Name', 'Question b)')
+rlocus(systeme_zpk)
+title("FT a partir de zpk()")
+
+fprintf("\n\n\n")
 
 
 
@@ -153,7 +178,7 @@ disp(["---------------------------------------------"])
 %       (AVEC ÉTAPES) ET VALIDATION MATLAB
 
 
-
+disp('**** dessiner a la main le lieu des racines ****')
 
 
 
@@ -166,6 +191,11 @@ disp(["---------------------------------------------"])
 
 %% d) EXPLICATION DE L'EFFET DE LA RÉTROACTION Kv SUR LA STABILITÉ,
 %       LE TEMPS DE STAB ET LE DEPASS MAX A PARTIR DU LIEU DE RACINES
+
+
+
+
+
 
                                                                                                                                                                                             
 
