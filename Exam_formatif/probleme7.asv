@@ -111,10 +111,6 @@ figure
 margin(G)
 grid on
 
-disp("margin value")
-[GM_0, PM_0, wp_0, wg_0] = margin(G)
-
-
 % fonction reduite
 figure
 bode(TF_reduce)
@@ -122,20 +118,5 @@ title("FT reduite")
 grid on
 
 figure
-margin(TF_reduce)
+margin(TF)
 grid on
-
-[GM_R, PM_R, wp_R, wg_R] = margin(TF_reduce)
-
-fprintf("\n\n\n")
-
-
-
-
-
-
-
-
-%% question e) - reponse temporelle
-
-disp("*** Question e) ***")
