@@ -324,7 +324,7 @@ Da = D1
 
 
 disp(' ')
-disp('*** La FT suivante a ete validee par les enseignants')
+disp('La FT suivante a ete validee par les')
 [num, den] = ss2tf(Aa, Ba, Ca, Da);
 TF = tf(num, den)
 
