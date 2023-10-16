@@ -313,14 +313,14 @@ C3 = C(3,:)
 C4 = C(4,:)
 C5 = C(5,:)   
 
-D1 = D(5,1)
+D5 = D(5,1)
 
 %Nouvelles matrices incluant leffet de la boucle interne (voir prob 5 procedural 1)
 Aa = A - B2*Kv*C1  % on garde A - B2*Kv*C1 car A+B... ne donne pas de resultats coherents
 % Aa = A + B2*Kv*C1;
 Ba = B1
 Ca = C5
-Da = D1
+Da = D5
 
 
 disp(' ')
