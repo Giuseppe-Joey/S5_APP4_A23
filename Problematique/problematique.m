@@ -22,76 +22,79 @@ Annexe_A
 %% a) ANALYSE DES CARACTÉRISTIQUES DYNAMIQUES DE L'AVION
 %     À PÂRTIR DES VALEURS PROPRES DU SYSTEME ET DE LA RÉPONSE TEMPORELLE
 %     DE LA VITESSE v DU SYSTEME SOUMIS A UN ÉCHELON SUR a_prop
-%     DONNER:       -le temps du premier pic;
-%                   -le dépassement maximum;
-%                   -le temps de stabilisation;
-%                   -le facteur d'amortissement;
-%                   -la période des oscillations amorties et naturelles et 
-%                    vérifier ces résultats à partir de la réponse
-%                    temporelle.
+%     DONNER, POUR CHAQUE MODE:         -le temps du premier pic;
+%                                       -le dépassement maximum;
+%                                       -le temps de stabilisation;
+%                                       -le facteur d'amortissement;
+%                                       -la période des oscillations amorties
+%                                           et naturelles et vérifier ces
+%                                           résultats à partir de la réponse
+%                                           temporelle.
 
 disp(" ")
 disp("*** Question a) ***")
 
 % calcul des valeurs propres du systeme 
 val_propes = eig(A)
+disp("On remarque qu'il y a deux paires de poles conj. complexes alors 2 modes dynamiques")
 
 % on trouve la fonction de transfert pour le 2e element de la matrice U
 % (soit aprop)
 [num, den] = ss2tf(A, B, C, D, 2);      
 v_sur_aprop = tf(num(1,:), den)
 
-zeros = roots(num(1,:))
-poles = roots(den)
+zeros = roots(num(1,:));
+poles = roots(den);
 
-figure('Name', 'Question a)')
-pzmap(zeros, poles)
+% figure('Name', 'Question a)')
+% pzmap(zeros, poles)
 
-
-
-figure('Name', 'Question a)')
-rlocus(v_sur_aprop)
-
-
+% figure('Name', 'Question a)')
+% rlocus(v_sur_aprop)
 
 % reduction de la FT avec residue
 [R, P, K] = residue(num(1,:), den);
-poid = abs(R) ./ abs(real(P))
+poid = abs(R) ./ abs(real(P));
+disp('On remarque que les poles dominants sont les 3e et 4e, mode dominant')
+disp(' ')
+disp(' ')
+
+
+% MODE 1
+disp("*** MODE 1 (mode dominant) ***")
+
 [numR, denR] = residue(R(3:4), P(3:4), K);
-TF_temporaire = tf(numR, denR)
+TF_temporaire = tf(numR, denR);
 
 % ajustement du gain DC
 gain0 = dcgain(v_sur_aprop);
 gainR = dcgain(TF_temporaire);
 
 numR = numR * (gain0/gainR);
-TF_reduce = tf(numR, denR)
+TF_reduce_mode1 = tf(numR, denR)
 
-
-
+% on trouve les zeros et les poles du mode dominant
 zeros = roots(numR);
 poles = roots(denR);
 
-figure('Name', 'Question a)')
-pzmap(zeros, poles)
+% figure('Name', 'Question a)')
+% pzmap(zeros, poles)
 
-
+% affichage de la reponse temporelle MODE 1
 figure('Name', 'Question a)')
-step(TF_reduce)
-title("Réponse temporelle à partir des carac temporelles")
+step(TF_reduce_mode1)
+title("Réponse temporelle MODE 1")
 grid on
 
-
-
 % selon la formule du     wa = wn* sqrt(1-zeta^2)
-wa = imag(poles)
-wa = wa(1)
+wa = imag(poles);
+wa = wa(1);
 
-wn = abs(poles)
-wn = wn(1)
+wn = abs(poles);
+wn = wn(1);
 
-zeta = -real(poles) / wn
-zeta = zeta(1)
+zeta = -real(poles) / wn;
+zeta = zeta(1);
 
 phi = acos(zeta);
 phi_degres = acosd(zeta);
@@ -102,9 +105,9 @@ Mp = 100 * exp(-pi/tan(phi));
 
 
 % affichage des caracartéristiques temporelles
-disp(["---------------------------------------------"]);
-disp(["Affichage des caracartéristiques temporelles:"]);
-disp(["---------------------------------------------"])
+disp(["--------------------------------------------------------------------------"]);
+disp(["Caracartéristiques temporelles *MODE 1* (poles qui ont le plus GRAND poid)"]);
+disp(["--------------------------------------------------------------------------"])
 disp(['wn   = ', num2str(wn), ' rad/s']);
 disp(['zeta = ', num2str(zeta), ' unites']);
 disp(['wa   = ', num2str(wa), ' rad/s']);
@@ -113,8 +116,78 @@ disp(['phi  = ', num2str(phi_degres), ' degrés']);
 disp(['Mp   = ', num2str(Mp), ' %']);
 disp(['ts   = ', num2str(ts), ' s']);
 disp(['tp   = ', num2str(tp), ' s']);
-disp(["---------------------------------------------"])
+disp(["--------------------------------------------------------------------------"])
 
+fprintf("\n\n")
+% *************************************************************************************
+
+
+
+
+
+
+
+% MODE 2
+disp("*** MODE 2 ***")
+% on trouve les poles 
+[num, den] = ss2tf(A, B, C, D, 2);
+[R, P, K] = residue(num(1,:), den);
+poid = abs(R) ./ abs(real(P))
+disp('On garde maintenant les 1er et 2e poles pour faire le mode 2')
+[numR, denR] = residue(R(1:2), P(1:2), K);
+
+% correction du gain DC
+gain0 = dcgain(num(1,:), den);
+gainR = dcgain(numR, denR);
+numR = numR * (gain0/gainR);
+TF_reduce_mode2 = tf(numR, denR)
+
+% affichage de la reponse temporelle MODE 2
+figure('Name', 'Question a)')
+step(TF_reduce_mode2)
+title("Réponse temporelle MODE 2")
+grid on
+
+% on trouve les caracteristiques temporelles
+poles = roots(denR);
+
+wa = imag(poles);
+wa = wa(1);
+
+wn = abs(poles);
+wn = wn(1);
+
+zeta = -real(poles) / wn;
+zeta = zeta(1);
+
+phi = acos(zeta);
+phi_degres = acosd(zeta);
+
+Mp = 100 * exp(-pi / tan(phi));
+ts = 4 / (zeta*wn);
+tp = pi / wa;
+
+
+
+
+
+
+% affichage des caracartéristiques temporelles
+disp(["--------------------------------------------------------------------------"]);
+disp(["Caracartéristiques temporelles *MODE 2* (poles qui ont le plus PETIT poid)"]);
+disp(["--------------------------------------------------------------------------"])
+disp(['wn   = ', num2str(wn), ' rad/s']);
+disp(['zeta = ', num2str(zeta), ' unites']);
+disp(['wa   = ', num2str(wa), ' rad/s']);
+disp(['phi  = ', num2str(phi), ' radian']);
+disp(['phi  = ', num2str(phi_degres), ' degrés']);
+disp(['Mp   = ', num2str(Mp), ' %']);
+disp(['ts   = ', num2str(ts), ' s']);
+disp(['tp   = ', num2str(tp), ' s']);
+disp(["--------------------------------------------------------------------------"]);
+
+
+% on affiche quelques lignes vides pour separer de la prochaine section
 fprintf("\n\n\n")
 
 
@@ -130,32 +203,34 @@ fprintf("\n\n\n")
 %% b) IDENTIFICATION DE LA FONCTION DE TRANSFERT À PHASE NON-MINIMALE
 %       À PARTIR DES PÔLES ET DES ZÉROS
 
+disp('*******************************************************************')
 disp("*** Question b) ***")
 
 % on utilise le 2e element de lentree soit a_prop
-[num, den] = ss2tf(A, B, C, D, 2)      
-v_sur_aprop = tf(num(1,:), den)
+[num, den] = ss2tf(A, B, C, D, 2);   
+v_sur_aprop = tf(num(1,:), den);
 
-zeros = roots(num(1,:))
-poles = roots(den)
+zeros = roots(num(1,:));
+poles = roots(den);
 
-longueur_zeros = length(zeros);
-longueur_poles = length(poles);
+n = length(zeros);
+m = length(poles);
+fprintf("n = %d et m = %d \n", n, m)
 
 [num, den] = zp2tf(zeros, poles, 1);
-TF_a_partir_zeros_poles_v_aprop = tf(num,den)
-
+v_sur_aprop_avec_zp2tf = tf(num,den);
 
 figure('Name', 'Question b)')
-rlocus(TF_a_partir_zeros_poles_v_aprop)
+rlocus(v_sur_aprop_avec_zp2tf)
 title("FT a partir de zp2tf()")
 
-% identification de la fonction de transfert à partir des pôles et zéros
-systeme_zpk = zpk(zeros, poles, 1)
+% % identification de la fonction de transfert à partir des pôles et zéros
+% systeme_zpk = zpk(zeros, poles, 1)
+% 
+% figure('Name', 'Question b)')
+% rlocus(systeme_zpk)
+% title("FT a partir de zpk()")
 
-figure('Name', 'Question b)')
-rlocus(systeme_zpk)
-title("FT a partir de zpk()")
 
 fprintf("\n\n\n")
 
@@ -168,8 +243,15 @@ fprintf("\n\n\n")
 %% c) PRÉSENTATION DU LIEU DES RACINES FAIT À LA MAIN ENTRE a_prop ET v 
 %       (AVEC ÉTAPES) ET VALIDATION MATLAB
 
+disp('*******************************************************************')
 disp("*** Question c) ***")
-disp('**** dessiner a la main le lieu des racines ****')
+disp('**** dessiner a la main le lieu des racines et verification avec MATLAB ****')
+
+figure('Name', 'Question c)')
+rlocus(v_sur_aprop_avec_zp2tf)
+title("FT a partir de zp2tf()")
+
+
 fprintf("\n\n\n")
 
 
@@ -180,10 +262,16 @@ fprintf("\n\n\n")
 
 
 
-%% d) EXPLICATION DE L'EFFET DE LA RÉTROACTION Kv SUR LA STABILITÉ,
-%       LE TEMPS DE STAB ET LE DEPASS MAX A PARTIR DU LIEU DE RACINES
+%% d) A PARTIR DU LIEU DE RACINES, EXPLICATION DE L'EFFET DE LA RÉTROACTION
+%      Kv SUR LA STABILITÉ, LE TEMPS DE STABilisation ET LE DEPASSement MAX
+ 
 
+disp('*******************************************************************')
 disp("*** Question d) ***")
+disp('on fait un zoom sur le lieu des racines pour trouver Kv')
+
+[num, den] = ss2tf(A, B, C, D, 2);   
+v_sur_aprop = tf(num(1,:), den);
 
 figure('Name', 'Question d)')
 rlocus(v_sur_aprop)
@@ -192,13 +280,7 @@ axis([-1.5    0.5   -1  1])
 Kv = 1.03;
 disp(['On trouve sur le graph le gain max Kv = ', num2str(Kv), ' au point dintersection'])
 fprintf("\n\n\n")
-
-
-
                                                                                                                                                                                             
-
-
-
 
 
 
@@ -213,27 +295,28 @@ fprintf("\n\n\n")
 %       2) CALCUL DU NOUVEAU MODELE n1(s)/d1(s) ET DU MODELE A1, B1, C1, D1
 %       INCLUANT LA BOUCLE
 
+disp('*******************************************************************')
 disp("*** Question e) ***")
 
 Kv = 1.03;
 
-B1 = B(:,1)
-B2 = B(:,2)
+B1 = B(:,1);
+B2 = B(:,2);
 
-C1 = C(1,:)     
-C2 = C(2,:)
-C3 = C(3,:)
-C4 = C(4,:)
-C5 = C(5,:)     
+C1 = C(1,:);  
+C2 = C(2,:);
+C3 = C(3,:);
+C4 = C(4,:);
+C5 = C(5,:);     
 
-%Nouvelles matrices incluant leffet de la boucle interne (voir prob 5procedural 1)
-Aa = A - B2*Kv*C1;
+%Nouvelles matrices incluant leffet de la boucle interne (voir prob 5 procedural 1)
+Aa = A - B2*Kv*C1;  % on garde A - B2*Kv*C1 car A+B... ne donne pas de resultats coherents
 % Aa = A + B2*Kv*C1;
 Ba = [B1    B2];
 Ca = C1;
 Da = [0     0];
 
-[num, den] = ss2tf(Aa, Ba, Ca, Da, 2)
+[num, den] = ss2tf(Aa, Ba, Ca, Da, 2);
 TF = tf(num, den)
 
 figure('Name', 'Question e)')
@@ -251,8 +334,7 @@ fprintf("\n\n\n")
 %% f) VÉRIFICATION DES MARGES AVEC DIAGRAMMES DE BODE ET Kv;
 %       COMMENTAIRE SUR LE SENS DES MARGES, UTILITÉ
 
-
-
+disp('*******************************************************************')
 disp("*** Question f) ***")
 
 figure('Name', 'Question f)')
@@ -276,10 +358,11 @@ fprintf("\n\n\n")
 
 
 
-%% g) RÉDUCTION DE LA FT  ENTRE a_prop ET v presentation de la nouvelle FT reduite
-% fermeture de la boucle a la main explications de leffet de Kv sur les param
-% standards (K, zeta, wn, tau) et la reponse
+%% g) réduction de la FT entre a_prop et v, présentation de la nouvelle FT
+%     réduite, fermeture de la boucle à la main sur cette FT, explication
+%     de leffet de Kv sur les param standards (K, zeta, wn, tau) et la reponse
 
+disp('*******************************************************************')
 disp("*** Question g) ***")
 
 [R, P, K] = residue(num, den);
@@ -321,66 +404,88 @@ tp = pi / (wn*sqrt(1-(zeta^2)))
 
 figure('Name', 'Question g)')
 
+fprintf("\n\n\n")
 
 
 
 
 
-%% h) 
 
 
 
 
+%% h) calcul du Kv avec le système réduit et comparaison avec la valeur
+%     trouvée ci-dessus en (e)
 
+disp('*******************************************************************')
+disp("*** Question h) ***")
 
 
+fprintf("\n\n\n")
 
 
 
-%% i)
 
 
 
+%% i) comparaison des lieux des racines original et réduit de la FT entre
+%     a_prop et v sur le même graphique
 
+disp('*******************************************************************')
+disp("*** Question i) ***")
 
 
+fprintf("\n\n\n")
 
 
 
-%% j)
 
 
 
 
+%% j) lieu des racines entre gamma_d et gamma incluant la boucle interne
+%     (i.e. n1/d1), effet de Kp sur la réponse
 
+disp('*******************************************************************')
+disp("*** Question j) ***")
 
 
+fprintf("\n\n\n")
 
 
-%% k)
 
 
 
 
 
+%% k) design de la boucle externe: avec Bode, 
+% (1) calculer Kp limite pour instabilité;
+% (2) calculer Kp pour marges de 6 dB et 30 degrés;
+% (3) mesurer l'erreur en régime permanent par simulation sur MATLAB
 
+disp('*******************************************************************')
+disp("*** Question k) ***")
 
 
+fprintf("\n\n\n")
 
 
-%% l)
 
 
 
 
 
 
+%% l) calcul de l'erreur en régime permanent à partir du gain statique tel
+% que lu sur le diagramme de Bode, comparaison avec (3) de l’item ci-dessus
 
 
+disp('*******************************************************************')
+disp("*** Question l) ***")
 
 
+fprintf("\n\n\n")
 
-%% m)
 
 
 
@@ -389,13 +494,31 @@ figure('Name', 'Question g)')
 
 
 
+%% m) calcul du nouveau modèle n2(s) / d2(s) et le modèle A2, B2, C2, D2
 
+disp('*******************************************************************')
+disp("*** Question m) ***")
 
 
+fprintf("\n\n\n")
 
-%% n)
 
 
+
+
+
+
+
+
+
+%% n) comparaison et discussion des réponses temporelles avec
+%     compensateurs P, PD, PI et PID
+
+disp('*******************************************************************')
+disp("*** Question n) ***")
+
+
+fprintf("\n\n\n")
 
 
 
