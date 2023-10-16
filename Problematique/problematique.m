@@ -46,19 +46,13 @@ poles = roots(den)
 
 figure('Name', 'Question a)')
 pzmap(zeros, poles)
-grid on
+
 
 
 figure('Name', 'Question a)')
 rlocus(v_sur_aprop)
-grid on
 
 
-% on peut trouver les ft sur chacun des elements de la sortie 
-% alpha_sur_aprop = tf(num(2,:), den)
-% teta_sur_aprop = tf(num(3,:), den)
-% q_sur_aprop = tf(num(4,:), den)
-% gamma_sur_aprop = tf(num(5,:), den)
 
 % reduction de la FT avec residue
 [R, P, K] = residue(num(1,:), den);
@@ -70,17 +64,17 @@ TF_temporaire = tf(numR, denR)
 gain0 = dcgain(v_sur_aprop);
 gainR = dcgain(TF_temporaire);
 
-new_num = numR * (gain0/gainR);
-TF_reduce = tf(new_num, denR)
+numR = numR * (gain0/gainR);
+TF_reduce = tf(numR, denR)
 
 
 
-zeros = roots(new_num);
+zeros = roots(numR);
 poles = roots(denR);
 
 figure('Name', 'Question a)')
 pzmap(zeros, poles)
-grid on
+
 
 figure('Name', 'Question a)')
 step(TF_reduce)
@@ -90,19 +84,18 @@ grid on
 
 
 % selon la formule du     wa = wn* sqrt(1-zeta^2)
-wa = abs(imag(poles));
-wa = wa(1);
+wa = imag(poles)
+wa = wa(1)
 
-% alpha est egal zeta * wn
-alpha = abs(real(poles));
-alpha = alpha(1);
+wn = abs(poles)
+wn = wn(1)
 
-wn = abs(poles);
-wn = wn(1);
+zeta = -real(poles) / wn
+zeta = zeta(1)
 
-zeta = abs(alpha / wn);
 phi = acos(zeta);
 phi_degres = acosd(zeta);
+
 ts = 4 / (zeta * wn);
 tp = pi / wa;
 Mp = 100 * exp(-pi/tan(phi));
@@ -137,8 +130,6 @@ fprintf("\n\n\n")
 %% b) IDENTIFICATION DE LA FONCTION DE TRANSFERT À PHASE NON-MINIMALE
 %       À PARTIR DES PÔLES ET DES ZÉROS
 
-disp(" ")
-disp(" ")
 disp("*** Question b) ***")
 
 % on utilise le 2e element de lentree soit a_prop
@@ -177,9 +168,9 @@ fprintf("\n\n\n")
 %% c) PRÉSENTATION DU LIEU DES RACINES FAIT À LA MAIN ENTRE a_prop ET v 
 %       (AVEC ÉTAPES) ET VALIDATION MATLAB
 
-
+disp("*** Question c) ***")
 disp('**** dessiner a la main le lieu des racines ****')
-
+fprintf("\n\n\n")
 
 
 
@@ -192,13 +183,15 @@ disp('**** dessiner a la main le lieu des racines ****')
 %% d) EXPLICATION DE L'EFFET DE LA RÉTROACTION Kv SUR LA STABILITÉ,
 %       LE TEMPS DE STAB ET LE DEPASS MAX A PARTIR DU LIEU DE RACINES
 
-[numFTBF, denFTBF] = rlocus(v_sur_aprop);
+disp("*** Question d) ***")
 
-% den_s = polyval(den,s)
+figure('Name', 'Question d)')
+rlocus(v_sur_aprop)
+axis([-1.5    0.5   -1  1])
 
-Kv = ((-1)*(den)) ./ num
-
-% Kv = (denFTBF - den) ./ num
+Kv = 1.03;
+disp(['On trouve sur le graph le gain max Kv = ', num2str(Kv), ' au point dintersection'])
+fprintf("\n\n\n")
 
 
 
@@ -220,7 +213,33 @@ Kv = ((-1)*(den)) ./ num
 %       2) CALCUL DU NOUVEAU MODELE n1(s)/d1(s) ET DU MODELE A1, B1, C1, D1
 %       INCLUANT LA BOUCLE
 
+disp("*** Question e) ***")
 
+Kv = 1.03;
+
+B1 = B(:,1)
+B2 = B(:,2)
+
+C1 = C(1,:)     
+C2 = C(2,:)
+C3 = C(3,:)
+C4 = C(4,:)
+C5 = C(5,:)     
+
+%Nouvelles matrices incluant leffet de la boucle interne (voir prob 5procedural 1)
+Aa = A - B2*Kv*C1;
+% Aa = A + B2*Kv*C1;
+Ba = [B1    B2];
+Ca = C1;
+Da = [0     0];
+
+[num, den] = ss2tf(Aa, Ba, Ca, Da, 2)
+TF = tf(num, den)
+
+figure('Name', 'Question e)')
+rlocus(TF)
+
+fprintf("\n\n\n")
 
 
 
@@ -234,10 +253,158 @@ Kv = ((-1)*(den)) ./ num
 
 
 
+disp("*** Question f) ***")
+
+figure('Name', 'Question f)')
+margin(TF)
+grid on
+
+
+figure('Name', 'Question f)')
+step(TF)
+grid on
+
+fprintf("\n\n\n")
 
 
 
 
 
 
-%% g) 
+
+
+
+
+
+%% g) RÉDUCTION DE LA FT  ENTRE a_prop ET v presentation de la nouvelle FT reduite
+% fermeture de la boucle a la main explications de leffet de Kv sur les param
+% standards (K, zeta, wn, tau) et la reponse
+
+disp("*** Question g) ***")
+
+[R, P, K] = residue(num, den);
+poid = abs(R) ./ abs(real(P))
+[numR, denR] = residue(R(3:4), P(3:4), K)
+
+tf_tempo = tf(numR, denR)
+
+% ajustement du gain dc
+gain0 = dcgain(num, den);
+gainR = dcgain(numR, denR);
+numR = numR * (gain0/gainR);
+TF_reduce = tf(numR, denR)
+
+
+figure('Name', 'Question g)')
+step(TF_reduce)
+grid on
+
+
+zeros = roots(numR)
+poles = roots(denR)
+
+wn = abs(poles)
+wn = wn(1)
+% wa = imag(poles)
+
+
+zeta = -real(poles) / wn
+zeta = zeta(1)
+
+phi = acos(zeta)
+
+Mp = 100 * exp(-pi / (tan(phi)))
+ts = 4 / (zeta*wn)
+tp = pi / (wn*sqrt(1-(zeta^2)))
+
+
+
+figure('Name', 'Question g)')
+
+
+
+
+
+
+%% h) 
+
+
+
+
+
+
+
+
+
+
+%% i)
+
+
+
+
+
+
+
+
+
+%% j)
+
+
+
+
+
+
+
+
+
+%% k)
+
+
+
+
+
+
+
+
+
+
+%% l)
+
+
+
+
+
+
+
+
+
+
+
+%% m)
+
+
+
+
+
+
+
+
+
+
+
+
+%% n)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
