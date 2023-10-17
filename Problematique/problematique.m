@@ -200,37 +200,64 @@ fprintf("\n\n\n")
 
 
 
+
+
+
 %% b) IDENTIFICATION DE LA FONCTION DE TRANSFERT À PHASE NON-MINIMALE
 %       À PARTIR DES PÔLES ET DES ZÉROS
 
 disp('*******************************************************************')
 disp("*** Question b) ***")
 
-% on utilise le 2e element de lentree soit a_prop
-[num, den] = ss2tf(A, B, C, D, 2);   
-v_sur_aprop = tf(num(1,:), den);
+disp("on desire gamma sur delta_c")
 
-zeros = roots(num(1,:));
-poles = roots(den);
+% on veut la premiere entree soit delta c
+[num, den] = ss2tf(A, B, C, D, 1)
+gamma_sur_deltaC = tf(num(5,:), den)        % on utilise la 5 ligne qui correspond a gamma
 
-n = length(poles);
-m = length(zeros);
-fprintf("n = %d et m = %d \n", n, m)
-fprintf("Il y a '%d' asymptote(s) a l'infini", n-m)
-
-[num, den] = zp2tf(zeros, poles, 1);
-v_sur_aprop_avec_zp2tf = tf(num,den);
+% figure('Name', 'Question b)')
+% rlocus(gamma_sur_deltaC)
+% title("Gamma sur DeltaC")
 
 figure('Name', 'Question b)')
-rlocus(v_sur_aprop_avec_zp2tf)
-title("FT a partir de zp2tf()")
+pzmap(gamma_sur_deltaC)
+title("Gamma sur DeltaC")
+axis([-0.05  0.05  -1    1   ])
+disp("on verifie quil y a bel et bien un zero a droite de laxe imaginauire")
 
-% % identification de la fonction de transfert à partir des pôles et zéros
-% systeme_zpk = zpk(zeros, poles, 1)
+
+
+
+% % on utilise le 2e element de lentree soit a_prop
+% [num, den] = ss2tf(A, B, C, D, 2);   
+% v_sur_aprop = tf(num(1,:), den);
+% 
+% zeros = roots(num(1,:));
+% poles = roots(den);
+% 
+% n = length(poles);
+% m = length(zeros);
+% fprintf("n = %d et m = %d \n", n, m)
+% fprintf("Il y a '%d' asymptote(s) a l'infini", n-m)
+% 
+% [num, den] = zp2tf(zeros, poles, 1);
+% v_sur_aprop_avec_zp2tf = tf(num,den);
 % 
 % figure('Name', 'Question b)')
-% rlocus(systeme_zpk)
-% title("FT a partir de zpk()")
+% rlocus(v_sur_aprop_avec_zp2tf)
+% title("FT a partir de zp2tf()")
+% 
+% % % identification de la fonction de transfert à partir des pôles et zéros
+% % systeme_zpk = zpk(zeros, poles, 1)
+% % 
+% % figure('Name', 'Question b)')
+% % rlocus(systeme_zpk)
+% % title("FT a partir de zpk()")
+
+
+
+
+
 
 
 fprintf("\n\n\n")
@@ -576,7 +603,7 @@ fprintf("\n\n\n")
 disp('*******************************************************************')
 disp("*** Question m) ***")
 
-FTBF = feedback(gamma_sur_delta * Kp, 1);
+FTBF = feedback(gamma_sur_delta * Kp, 1)
 
 figure('Name', 'Question m)')
 step(gamma_sur_delta)
