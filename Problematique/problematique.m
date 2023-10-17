@@ -430,6 +430,16 @@ fprintf("\n\n\n")
 disp('*******************************************************************')
 disp("*** Question h) ***")
 
+Kv = 1.03;
+
+FTBF = feedback(v_sur_aprop, Kv);
+TF = tf([2.122*Kv    1.465*Kv],[1   (2.122*Kv+0.028)    (1.465*Kv+0.047)])
+
+figure('Name', 'Question h)')
+rlocus(FTBF)
+hold on
+rlocus(TF)
+legend('FTBF', 'TF')
 
 fprintf("\n\n\n")
 
@@ -482,7 +492,7 @@ fprintf("\n\n\n")
 disp('*******************************************************************')
 disp("*** Question j) ***")
 
-[num,den] = ss2tf(A1,B1,C1,D1, 1)   % le 1 signifie quon veut le 1e element de U (soit delta_c)
+[num,den] = ss2tf(A1,B1,C1,D1, 1);   % le 1 signifie quon veut le 1e element de U (soit delta_c)
 gamma_sur_deltaC = tf(num(5), den)         % on veut 
 
 figure('Name', 'Question j)');
@@ -505,6 +515,28 @@ fprintf("\n\n\n")
 disp('*******************************************************************')
 disp("*** Question k) ***")
 
+[num,den] = ss2tf(A1,B1,C1,D1,1);   % le 1 signifie quon veut le 1e element de U (soit delta_c)
+gamma_sur_delta = tf(num(5), den)         % gamma/delta
+
+% Kp donne a 6 dB
+Kp = 10^(6/20)
+
+
+figure('Name', 'Question k)')
+margin(gamma_sur_delta * Kp)
+grid on
+
+
+[GM,PM,wp,wg] = margin(gamma_sur_delta * Kp)
+GM_dB = 20*log10(GM)
+
+% Calcule de lerreur en régime permanent
+FT = gamma_sur_delta * Kp
+[num,den] = tfdata(FT);
+
+% puisque s tend vers 0
+K_pos = num{1}(end)/den{1}(end)
+e_RP = 1/(1+K_pos)
 
 fprintf("\n\n\n")
 
@@ -522,6 +554,12 @@ fprintf("\n\n\n")
 disp('*******************************************************************')
 disp("*** Question l) ***")
 
+% on obtient la magnitude
+[mag] = bode(gamma_sur_delta * Kp);
+mag = squeeze(mag);
+
+Kpos_bode = mag(1)
+erp_bode = 1/(1+Kpos_bode)
 
 fprintf("\n\n\n")
 
@@ -538,6 +576,17 @@ fprintf("\n\n\n")
 disp('*******************************************************************')
 disp("*** Question m) ***")
 
+FTBF = feedback(gamma_sur_delta * Kp, 1);
+
+figure('Name', 'Question m)')
+step(gamma_sur_delta)
+hold on
+step(FTBF)
+legend('FTBO Gamma sur delta', 'FTBF Gamma sur delta')
+
+
+[num,den] = tfdata(FTBF)
+[A2,B2,C2,D2] = tf2ss(num{1},den{1})
 
 fprintf("\n\n\n")
 
@@ -556,6 +605,13 @@ fprintf("\n\n\n")
 disp('*******************************************************************')
 disp("*** Question n) ***")
 
+P = 0;
+
+PD = 0;
+
+PI = 0;
+
+PID = 0;
 
 fprintf("\n\n\n")
 
