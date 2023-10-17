@@ -316,16 +316,16 @@ C5 = C(5,:);
 D5 = D(5,1);
 
 %Nouvelles matrices incluant leffet de la boucle interne (voir prob 5 procedural 1)
-Aa = A - B2*Kv*C1;  % on garde A - B2*Kv*C1 car A+B... ne donne pas de resultats coherents
+A1 = A - B2*Kv*C1;  % on garde A - B2*Kv*C1 car A+B... ne donne pas de resultats coherents
 % Aa = A + B2*Kv*C1;
-Ba = B1;
-Ca = C5;
-Da = D5;
+B1 = B1;
+C1 = C5;
+D1 = D5;
 
 
 disp(' ')
 disp('*** La FT suivante a ete validee par les enseignants et est bonne')
-[num, den] = ss2tf(Aa, Ba, Ca, Da);
+[num, den] = ss2tf(A1, B1, C1, D1);
 TF = tf(num, den)
 
 figure('Name', 'Question e)')
@@ -482,6 +482,12 @@ fprintf("\n\n\n")
 disp('*******************************************************************')
 disp("*** Question j) ***")
 
+[num,den] = ss2tf(A1,B1,C1,D1, 1)   % le 1 signifie quon veut le 1e element de U (soit delta_c)
+gamma_sur_deltaC = tf(num(5), den)         % on veut 
+
+figure('Name', 'Question j)');
+rlocus(gamma_sur_deltaC);
+title("Rlocus de gamma sur deltaC")
 
 fprintf("\n\n\n")
 
