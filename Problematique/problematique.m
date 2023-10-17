@@ -304,27 +304,27 @@ disp("*** Question e) ***")
 
 Kv = 1.03;
 
-B1 = B(:,1)
-B2 = B(:,2)
+B1 = B(:,1);
+B2 = B(:,2);
 
-C1 = C(1,:)
-C2 = C(2,:)
-C3 = C(3,:)
-C4 = C(4,:)
-C5 = C(5,:)   
+C1 = C(1,:);
+C2 = C(2,:);
+C3 = C(3,:);
+C4 = C(4,:);
+C5 = C(5,:);   
 
-D5 = D(5,1)
+D5 = D(5,1);
 
 %Nouvelles matrices incluant leffet de la boucle interne (voir prob 5 procedural 1)
-Aa = A - B2*Kv*C1  % on garde A - B2*Kv*C1 car A+B... ne donne pas de resultats coherents
+Aa = A - B2*Kv*C1;  % on garde A - B2*Kv*C1 car A+B... ne donne pas de resultats coherents
 % Aa = A + B2*Kv*C1;
-Ba = B1
-Ca = C5
-Da = D5
+Ba = B1;
+Ca = C5;
+Da = D5;
 
 
 disp(' ')
-disp('*** La FT suivante a ete validee par les enseignants')
+disp('*** La FT suivante a ete validee par les enseignants et est bonne')
 [num, den] = ss2tf(Aa, Ba, Ca, Da);
 TF = tf(num, den)
 
@@ -444,6 +444,29 @@ fprintf("\n\n\n")
 disp('*******************************************************************')
 disp("*** Question i) ***")
 
+[num, den] = ss2tf(A, B, C, D, 2);
+v_sur_aprop = tf(num(1,:), den)
+
+
+[R, P, K] = residue(num(1,:), den);
+poid = abs(R) ./ abs(real(P))
+[numR, denR] = residue(R(3:4), P(3:4), K);
+tf_tempo = tf(numR, denR);
+
+% ajustement du gain DC
+gain0 = dcgain(v_sur_aprop);
+gainR = dcgain(tf_tempo);
+numR = numR * (gain0/gainR);
+
+tf_reduite = tf(numR, denR)
+
+
+figure('Name', 'Question i)')
+rlocus(v_sur_aprop)
+hold on
+rlocus(tf_reduite)
+title('Comparaison entre FT originale et FT reduite')
+legend('FT v sur a_prop originale', 'FT reduite')
 
 fprintf("\n\n\n")
 
