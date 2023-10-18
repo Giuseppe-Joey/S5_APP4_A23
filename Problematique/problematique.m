@@ -5,7 +5,7 @@
 %   CIP:        HANI1401
 
 %   Date de creation:                       10-Octobre-2023
-%   Date de derniere modification:          16-Octobre-2023
+%   Date de derniere modification:          18-Octobre-2023
 
 %   DESCRIPTION: PROBLÉMATIQUE
 
@@ -384,6 +384,20 @@ disp(['ts   = ', num2str(ts), ' s']);
 disp(['tp   = ', num2str(tp), ' s']);
 disp(["--------------------------------------------------------------------------"]);
 
+
+
+figure('Name', "Question g)")
+step(TF_reduce)
+title("Reponse impultionnelle v sur aprop reduite")
+grid on
+
+figure('Name', "Question g)")
+step(FTBF)
+title("Reponse impultionnelle v sur aprop reduite avec gain Kv")
+grid on
+
+
+
 fprintf("\n\n\n")
 
 
@@ -457,8 +471,24 @@ gamma_sur_deltaC = tf(num(5), den)         % on veut
 
 figure('Name', 'Question j)');
 rlocus(gamma_sur_deltaC);
-title("Rlocus de gamma sur deltaC")
+title("Rlocus de gamma sur deltaC ZOOM")
 axis([-4    0    -6     6])
+
+figure('Name', 'Question j)');
+rlocus(gamma_sur_deltaC);
+title("Rlocus de gamma sur deltaC")
+
+figure('Name', 'Question j)');
+step(gamma_sur_deltaC);
+title("Gamma sur deltaC FTBO")
+grid on
+
+FTBF_gamma_sur_deltac = feedback(gamma_sur_deltaC, Kv);
+
+figure('Name', 'Question j)');
+step(FTBF_gamma_sur_deltac);
+title("Gamma sur deltaC FTBF")
+grid on
 
 fprintf("\n\n\n")
 
@@ -482,6 +512,7 @@ disp("*** Question k) ***")
 [num,den] = ss2tf(A1,B1,C1,D1, 1);   % le 1 signifie quon veut le 1e element de U (soit delta_c)
 gamma_sur_deltaC = tf(num(5), den) 
 
+num = num(5);
 [GM,PM,Wp,Wg] = margin(num, den);
 
 figure('Name', 'Question k)')
@@ -507,10 +538,10 @@ disp('*******************************************************************')
 disp("*** Question l) ***")
 
 figure('Name', 'Question l)')
-bode(gamma_sur_deltaC)
+margin(gamma_sur_deltaC)
 grid on
 
-Kpos = num(end)/den(end)
+Kpos = num(end) / den(end)
 erp = 1/(1+Kpos)
 
 fprintf("\n\n\n")
@@ -530,10 +561,10 @@ fprintf("\n\n\n")
 disp('*******************************************************************')
 disp("*** Question m) ***")
 
-A2 = A1 - (B1*Kp*C(5,:));
-B2 = B1*Kp;
-C2 = C(5,:);
-D2 = 0;
+A2 = A1 - (B1*Kp*C(5,:))
+B2 = B1*Kp
+C2 = C(5,:)
+D2 = 0
 
 [num2, den2] = ss2tf(A2,B2,C2,D2);
 TF2 = tf(num2, den2)
@@ -554,17 +585,17 @@ disp("*** Question n) ***")
 % compensateur PD
 num_PD = Kp * [1    1];
 den_PD = [1];
-G_PD = tf(num_PD, den_PD);
+G_PD = tf(num_PD, den_PD)
 
 % compensateur PI
 num_PI = Kp * [1    1];
 den_PI = [1     0];
-G_PI = tf(num_PI, den_PI);
+G_PI = tf(num_PI, den_PI)
 
 % compensateur PID
 num_PID = Kp * [1    1      1];
 den_PID = [1        0];
-G_PID = tf(num_PID, den_PID);
+G_PID = tf(num_PID, den_PID)
 
 FTBF_P = feedback(TF2, 1);
 FTBF_PD = feedback(G_PD*TF2, 1);
