@@ -44,13 +44,7 @@ disp("On remarque qu'il y a deux paires de poles conj. complexes alors 2 modes d
 v_sur_aprop = tf(num(1,:), den)
 
 zeros = roots(num(1,:));
-poles = roots(den);
-
-% figure('Name', 'Question a)')
-% pzmap(zeros, poles)
-
-% figure('Name', 'Question a)')
-% rlocus(v_sur_aprop)
+poles = val_propes;
 
 % reduction de la FT avec residue
 [R, P, K] = residue(num(1,:), den);
@@ -80,7 +74,7 @@ poles = roots(denR);
 % affichage de la reponse temporelle MODE 1
 figure('Name', 'Question a)')
 step(TF_reduce_mode1)
-title("Réponse temporelle MODE 1")
+title("Réponse temporelle MODE 1 - PHUGOIDE")
 grid on
 
 % selon la formule du     wa = wn* sqrt(1-zeta^2)
@@ -218,6 +212,9 @@ pzmap(gamma_sur_deltaC)
 title("Gamma sur DeltaC")
 axis([-0.05  0.05  -1    1   ])
 
+figure
+rlocus(gamma_sur_deltaC)
+
 
 fprintf("\n\n\n")
 
@@ -282,12 +279,12 @@ disp('*******************************************************************')
 disp("*** Question e) ***")
 
 % Nouvelles matrices incluant leffet de la boucle interne (voir prob 5 procedural 1)
-A1 = A - B(:,2)*Kv*C(1,:);  % on garde A - B2*Kv*C1 car on demande retroaction negative
-B1 = B(:,1);
-C1 = C(5,:);
-D1 = D(5,1);
+A1 = A - B(:,2)*Kv*C(1,:)  % on garde A - B2*Kv*C1 car on demande retroaction negative
+B1 = B(:,1)
+C1 = C(5,:)
+D1 = D(5,1)
 
-[num, den] = ss2tf(A1, B1, C1, D1);
+[num, den] = ss2tf(A1, B1, C1, D1)
 TF = tf(num, den)
 
 figure('Name', 'Question e)')
@@ -308,14 +305,15 @@ fprintf("\n\n\n")
 disp('*******************************************************************')
 disp("*** Question f) ***")
 
-figure('Name', 'Question f)')
-margin(TF)
-grid on
-
+FTBF = feedback(v_sur_aprop, Kv)
 
 figure('Name', 'Question f)')
-step(TF)
+margin(v_sur_aprop)
+hold on
+margin(FTBF)
 grid on
+legend('v sur aprop', 'v sur aprop avec Kv')
+
 
 fprintf("\n\n\n")
 
@@ -336,24 +334,21 @@ fprintf("\n\n\n")
 disp('*******************************************************************')
 disp("*** Question g) ***")
 
-[R, P, K] = residue(num, den);
+[num, den] = ss2tf(A, B, C, D, 2);
+[R, P, K] = residue(num(1,:), den);
 poid = abs(R) ./ abs(real(P))
 [numR, denR] = residue(R(3:4), P(3:4), K);
 
-tf_tempo = tf(numR, denR);
-
 % ajustement du gain dc
-gain0 = dcgain(num, den);
+gain0 = dcgain(num(1,:), den);
 gainR = dcgain(numR, denR);
 numR = numR * (gain0/gainR);
+
 TF_reduce = tf(numR, denR)
+FTBF = feedback(TF_reduce, Kv)
+[numR, denR] = tfdata(FTBF, 'v');
 
-
-figure('Name', 'Question g)')
-step(TF_reduce)
-grid on
-
-
+% calcul des caracteristiques temporelles
 zeros = roots(numR);
 poles = roots(denR);
 
@@ -374,7 +369,19 @@ tp = pi / (wn*sqrt(1-(zeta^2)));
 
 
 
-figure('Name', 'Question g)')
+% affichage des caracartéristiques temporelles
+disp(["--------------------------------------------------------------------------"]);
+disp(["Caracartéristiques temporelles FTBF Reduite"]);
+disp(["--------------------------------------------------------------------------"])
+disp(['wn   = ', num2str(wn), ' rad/s']);
+disp(['zeta = ', num2str(zeta), ' unites']);
+disp(['wa   = ', num2str(wa), ' rad/s']);
+disp(['phi  = ', num2str(phi), ' radian']);
+disp(['phi  = ', num2str(phi_degres), ' degrés']);
+disp(['Mp   = ', num2str(Mp), ' %']);
+disp(['ts   = ', num2str(ts), ' s']);
+disp(['tp   = ', num2str(tp), ' s']);
+disp(["--------------------------------------------------------------------------"]);
 
 fprintf("\n\n\n")
 
@@ -410,37 +417,27 @@ fprintf("\n\n\n")
 
 
 
+
+
+
 %% i) comparaison des lieux des racines original et réduit de la FT entre
 %     a_prop et v sur le même graphique
 
 disp('*******************************************************************')
 disp("*** Question i) ***")
 
-[num, den] = ss2tf(A, B, C, D, 2);
-v_sur_aprop = tf(num(1,:), den)
-
-
-[R, P, K] = residue(num(1,:), den);
-poid = abs(R) ./ abs(real(P))
-[numR, denR] = residue(R(3:4), P(3:4), K);
-tf_tempo = tf(numR, denR);
-
-% ajustement du gain DC
-gain0 = dcgain(v_sur_aprop);
-gainR = dcgain(tf_tempo);
-numR = numR * (gain0/gainR);
-
-tf_reduite = tf(numR, denR)
-
-
 figure('Name', 'Question i)')
 rlocus(v_sur_aprop)
 hold on
-rlocus(tf_reduite)
+rlocus(TF_reduce)
 title('Comparaison entre FT originale et FT reduite')
 legend('FT v sur a_prop originale', 'FT reduite')
+axis([-1.5    0.1     -1    1])
 
 fprintf("\n\n\n")
+
+
+
 
 
 
@@ -460,8 +457,12 @@ gamma_sur_deltaC = tf(num(5), den)         % on veut
 figure('Name', 'Question j)');
 rlocus(gamma_sur_deltaC);
 title("Rlocus de gamma sur deltaC")
+axis([-4    0    -6     6])
 
 fprintf("\n\n\n")
+
+
+
 
 
 
@@ -509,6 +510,9 @@ fprintf("\n\n\n")
 
 
 
+
+
+
 %% l) calcul de l'erreur en régime permanent à partir du gain statique tel
 % que lu sur le diagramme de Bode, comparaison avec (3) de l’item ci-dessus
 
@@ -524,6 +528,8 @@ Kpos_bode = mag(1)
 erp_bode = 1/(1+Kpos_bode)
 
 fprintf("\n\n\n")
+
+
 
 
 

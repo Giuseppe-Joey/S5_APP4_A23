@@ -86,8 +86,8 @@ plot(t, y6)
 [p, z] = pzmap(FTBO_0(6))
 tot = sum(p) - sum(z)
 
-% figure(3)
-% rlocus(FTBO_0(6))
+figure(3)
+rlocus(FTBO_0(6))
 
 
 s = roots([-1.196 -14.03 -241.81 -1138.95 -3587.17 -3333.95 68.03])  
