@@ -482,10 +482,16 @@ disp("*** Question k) ***")
 [num,den] = ss2tf(A1,B1,C1,D1, 1);   % le 1 signifie quon veut le 1e element de U (soit delta_c)
 gamma_sur_deltaC = tf(num(5), den) 
 
-[GM,PM,Wp,Wg] = margin(num, den)
+[GM,PM,Wp,Wg] = margin(num, den);
 
-Kp_limite = 20*log10(GM);
-Kp = 10^((Kp_limite-6)/20);
+figure('Name', 'Question k)')
+margin(num, den)
+grid on
+
+Kp_limite = 20*log10(GM)
+Kp = 10^((Kp_limite-6)/20)
+erp = 1/(1+Kp)
+
 
 
 
