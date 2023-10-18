@@ -233,7 +233,8 @@ disp('**** dessiner a la main le lieu des racines et verification avec MATLAB **
 
 figure('Name', 'Question c)')
 rlocus(v_sur_aprop)
-title("FT v_sur_aprop a partir de zp2tf()")
+title("FT v sur aprop")
+axis([-4    1     -8       8])
 
 
 fprintf("\n\n\n")
