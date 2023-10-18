@@ -499,10 +499,6 @@ Kp = 10^((Kp_limite-6)/20);
 disp('*******************************************************************')
 disp("*** Question l) ***")
 
-figure('Name', 'Question l)')
-bode(gamma_sur_deltaC)
-grid on
-
 Kpos = num(end)/den(end)
 erp = 1/(1+Kpos)
 
@@ -523,6 +519,9 @@ fprintf("\n\n\n")
 disp('*******************************************************************')
 disp("*** Question m) ***")
 
+
+
+
 A2 = A1 - (B1*Kp*C(5,:));
 B2 = B1*Kp;
 C2 = C(5,:);
@@ -531,7 +530,7 @@ D2 = 0;
 [num2, den2] = ss2tf(A2,B2,C2,D2);
 TF2 = tf(num2, den2)
 
-fprintf("\n\n\n")
+
 
 
 
@@ -547,22 +546,27 @@ disp("*** Question n) ***")
 % compensateur PD
 num_PD = Kp * [1    1];
 den_PD = [1];
-G_PD = tf(num_PD, den_PD);
+G_PD = tf(num_PD, den_PD)
 
 % compensateur PI
 num_PI = Kp * [1    1];
 den_PI = [1     0];
-G_PI = tf(num_PI, den_PI);
+G_PI = tf(num_PI, den_PI)
 
 % compensateur PID
 num_PID = Kp * [1    1      1];
 den_PID = [1        0];
-G_PID = tf(num_PID, den_PID);
+G_PID = tf(num_PID, den_PID)
 
-FTBF_P = feedback(TF2, 1);
-FTBF_PD = feedback(G_PD*TF2, 1);
-FTBF_PI = feedback(G_PI*TF2, 1);
-FTBF_PID = feedback(G_PID*TF2, 1);
+FTBO_P = TF2;
+FTBO_PD = G_PD * TF2;
+FTBO_PI = G_PI * TF2;
+FTBO_PID = G_PID * TF2;
+
+FTBF_P = feedback(FTBO_P,1)
+FTBF_PD = feedback(FTBO_PD,1)
+FTBF_PI = feedback(FTBO_PI,1)
+FTBF_PID = feedback(FTBO_PID,1)
 
 
 figure('Name', 'Question n)')
